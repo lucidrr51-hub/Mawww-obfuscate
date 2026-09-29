@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mawww Lua Obfuscator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Mawww Obfuscator</h1>
+            <p class="subtitle">Advanced Lua/Luau Protection — Delta Compatible</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab active" data-tab="paste">📝 Paste Code</button>
+            <button class="tab" data-tab="upload">📁 Upload File</button>
+        </div>
+
+        <div class="tab-content active" id="paste">
+            <textarea id="luaCode" placeholder="-- Paste your Lua code here...&#10;print('Hello, World!')"></textarea>
+        </div>
+
+        <div class="tab-content" id="upload">
+            <div class="file-drop" id="fileDrop">
+                <p>Drag & drop file .lua di sini</p>
+                <p class="small">atau</p>
+                <label for="luaFile" class="file-btn">Pilih File</label>
+                <input type="file" id="luaFile" accept=".lua,.txt" hidden>
+                <p id="fileName" class="filename"></p>
+            </div>
+        </div>
+
+        <div class="options">
+            <h3>⚙️ Konfigurasi Proteksi</h3>
+            <div class="option-grid">
+                <label><input type="checkbox" id="optRename" checked> Variable Renaming</label>
+                <label><input type="checkbox" id="optStrings" checked> String Encryption</label>
+                <label><input type="checkbox" id="optNumbers" checked> Number Obfuscation</label>
+                <label><input type="checkbox" id="optControlFlow" checked> Control Flow Flattening</label>
+                <label><input type="checkbox" id="optDeadCode" checked> Dead Code Injection</label>
+                <label><input type="checkbox" id="optAntiDebug" checked> Anti-Debugging</label>
+                <label><input type="checkbox" id="optVM" checked> VM Wrapper</label>
+            </div>
+        </div>
+
+        <button id="obfuscateBtn" class="main-btn">🔒 Obfuscate!</button>
+
+        <div id="status" class="status"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
