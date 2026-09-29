@@ -1,29 +1,28 @@
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
-const { obfuscateLua } = require('./utils/obfuscator'); // Kita akan buat ini nanti
+const { fullObfuscate } = require('./utils/obfuscator');
 
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Konfigurasi penyimpanan file sementara
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ 
+    storage: storage,
+    limits: { fileSize: 5 * 1024 * 1024 } // Max 5MB
+});
 
-// Sajikan file statis dari folder 'public'
 app.use(express.static('public'));
+app.use(express.json({ limit: '10mb' }));
 
-// Endpoint untuk memproses obfuscation
 app.post('/obfuscate', upload.single('luaFile'), async (req, res) => {
     try {
         let luaCode = '';
+        let options = {};
 
-        // Cek apakah ada file yang diupload
         if (req.file) {
             luaCode = req.file.buffer.toString('utf-8');
-        } 
-        // Jika tidak ada file, cek apakah ada teks yang dikirim
-        else if (req.body.luaCode) {
+        } else if (req.body.luaCode) {
             luaCode = req.body.luaCode;
         } else {
             return res.status(400).json({ error: 'Tidak ada kode Lua yang diberikan.' });
@@ -33,20 +32,23 @@ app.post('/obfuscate', upload.single('luaFile'), async (req, res) => {
             return res.status(400).json({ error: 'Kode Lua kosong.' });
         }
 
-        // Panggil fungsi obfuscation
-        const obfuscatedCode = await obfuscateLua(luaCode);
+        // Parse opsi konfigurasi
+        if (req.body.options) {
+            try { options = JSON.parse(req.body.options); } catch(e) {}
+        }
 
-        // Kirim hasil kembali sebagai file .lua
-        res.setHeader('Content-Disposition', 'attachment; filename="obfuscated.lua"');
-        res.setHeader('Content-Type', 'text/plain');
+        const obfuscatedCode = await fullObfuscate(luaCode, options);
+
+        res.setHeader('Content-Disposition', 'attachment; filename="protected.lua"');
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8');
         res.send(obfuscatedCode);
 
     } catch (error) {
         console.error('Obfuscation error:', error);
-        res.status(500).json({ error: 'Terjadi kesalahan saat mengobfuscate kode.' });
+        res.status(500).json({ error: 'Terjadi kesalahan: ' + error.message });
     }
 });
 
 app.listen(port, () => {
-    console.log(`Server berjalan di http://localhost:${port}`);
+    console.log(`Mawww Obfuscator berjalan di port ${port}`);
 });
